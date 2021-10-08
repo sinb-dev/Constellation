@@ -13,7 +13,8 @@ namespace Constellation_WebApi
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            ContainerHandler.QueryContainer("Cont");
+         //   CreateHostBuilder(args).Build().Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

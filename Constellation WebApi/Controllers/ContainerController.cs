@@ -11,7 +11,7 @@ namespace Constellation_WebApi.Controllers
     [Route("[controller]")]
     public class ContainerController : ControllerBase
     {
-        public class Response {
+        public class ContainerResponse {
             public string message {get;set;}
         }
         private readonly ILogger<ContainerController> _logger;
@@ -22,13 +22,24 @@ namespace Constellation_WebApi.Controllers
         }
 
         [HttpGet]
-        public Response Get(string myrequest="")
+        public ContainerResponse Get(string myrequest="")
         {
-            Response response = new();
+            ContainerResponse response = new();
             if (myrequest != "")
                 response.message = myrequest;
             else
                 response.message = "Du er bare SÅ dygtig!!!";
+
+            
+            return response;
+        }
+
+        [HttpGet]
+        public ContainerResponse Query(string containerName)
+        {
+            ContainerResponse response = new();
+            ContainerHandler.QueryContainer("Cont");
+            response.message = "hej";
             return response;
         }
     }
