@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Docker.DotNet;
+using Docker.DotNet.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -7,13 +9,14 @@ using System.Threading.Tasks;
 
 namespace Constellation_WebApi.Controllers
 {
+    public class ContainerResponse {
+        public string message {get;set;}
+    }
     [ApiController]
     [Route("[controller]")]
     public class ContainerController : ControllerBase
     {
-        public class ContainerResponse {
-            public string message {get;set;}
-        }
+        
         private readonly ILogger<ContainerController> _logger;
 
         public ContainerController(ILogger<ContainerController> logger)
@@ -21,7 +24,7 @@ namespace Constellation_WebApi.Controllers
             _logger = logger;
         }
 
-        [HttpGet]
+        /*[HttpGet]
         public ContainerResponse Get(string myrequest="")
         {
             ContainerResponse response = new();
@@ -32,15 +35,27 @@ namespace Constellation_WebApi.Controllers
 
             
             return response;
-        }
+        }*/
 
         [HttpGet]
+        public async Task<ContainerResponse> Run(string userId, string image, int port)
+        {
+            
+
+            var result = ContainerHandler.Run(image);
+            ContainerResponse response = new();
+            response.message = result.Result;
+            
+            return response;
+        }
+
+        /*[HttpGet]
         public ContainerResponse Query(string containerName)
         {
             ContainerResponse response = new();
             ContainerHandler.QueryContainer("Cont");
             response.message = "hej";
             return response;
-        }
+        }*/
     }
 }

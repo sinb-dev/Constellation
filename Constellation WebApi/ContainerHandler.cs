@@ -3,12 +3,68 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using Docker.DotNet;
 using Docker.DotNet.Models;
+using System.Threading.Tasks;
+
 namespace Constellation_WebApi
 {
     public static class ContainerHandler
     {
+        static DockerClient client;
+        static ContainerHandler() 
+        {
+            if (System.Environment.OSVersion.Platform == PlatformID.Unix)
+            {
+                client = new DockerClientConfiguration(
+                    new Uri("unix:///var/run/docker.sock"))
+                    .CreateClient();
+            } 
+            else 
+            {
+                client = new DockerClientConfiguration(
+                    new Uri("npipe://./pipe/docker_engine"))
+                    .CreateClient();
+            }
+        }
         const string REPOSITORY = "docker.data.techcollege.dk";
-        public static string Run(string image)
+
+        public static async Task<string> Run(string image)
+        {
+            await client.Images
+        .CreateImageAsync(new ImagesCreateParameters
+            {
+                FromImage = "docker.data.techcollege.dk/hello-world",
+                Tag = "latest"
+            },
+            new AuthConfig(),
+            new Progress<JSONMessage>());
+            
+
+            var response = await client.Containers.CreateContainerAsync(new CreateContainerParameters
+                {
+                    Image = "docker.data.techcollege.dk/hello-world",
+                    ExposedPorts = new Dictionary<string, EmptyStruct>
+                    {
+                        {
+                            "8000", default(EmptyStruct)
+                        }
+                    },
+                    HostConfig = new HostConfig
+                    {
+                        PortBindings = new Dictionary<string, IList<PortBinding>>
+                        {
+                            {"8000", new List<PortBinding> {new PortBinding {HostPort = "8000"}}}
+                        },
+                        PublishAllPorts = true
+                    }
+                });
+
+
+            return "";
+            
+            //ContainerResponse response = new();
+            //return response;
+        }
+        public static string RunCmd(string image)
         {
             string name = "Cont";
             int internalPort = 8080;
