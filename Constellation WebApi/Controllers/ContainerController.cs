@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace Constellation_WebApi.Controllers
 {
@@ -24,38 +25,23 @@ namespace Constellation_WebApi.Controllers
             _logger = logger;
         }
 
-        /*[HttpGet]
-        public ContainerResponse Get(string myrequest="")
-        {
-            ContainerResponse response = new();
-            if (myrequest != "")
-                response.message = myrequest;
-            else
-                response.message = "Du er bare SÅ dygtig!!!";
-
-            
-            return response;
-        }*/
-
         [HttpGet]
         public async Task<ContainerResponse> Run(string userId, string image, int port)
         {
             
-
-            var result = ContainerHandler.Run(image);
+            var result = await ContainerHandler.Run(image, port, 10000);
             ContainerResponse response = new();
-            response.message = result.Result;
+            response.message = result;
             
             return response;
         }
 
-        /*[HttpGet]
-        public ContainerResponse Query(string containerName)
+        [HttpGet("query")]
+        public async Task<string> Query(string containerName)
         {
-            ContainerResponse response = new();
-            ContainerHandler.QueryContainer("Cont");
-            response.message = "hej";
-            return response;
-        }*/
+            ContainerListResponse container = await ContainerHandler.QueryContainer(containerName);
+            
+            return JsonSerializer.Serialize(container);;
+        }
     }
 }

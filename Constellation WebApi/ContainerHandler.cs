@@ -27,42 +27,43 @@ namespace Constellation_WebApi
         }
         const string REPOSITORY = "docker.data.techcollege.dk";
 
-        public static async Task<string> Run(string image)
+        public static async Task<string> Run(string image, int containerPort=0, int hostPort=0)
         {
+            string repo_image = REPOSITORY+"/"+image;
             await client.Images
-        .CreateImageAsync(new ImagesCreateParameters
+                .CreateImageAsync(new ImagesCreateParameters
+                    {
+                        FromImage = repo_image,
+                        Tag = "latest"
+                    },
+                    new AuthConfig(),
+                    new Progress<JSONMessage>());
+            Dictionary<string, EmptyStruct> exposedPort = null;
+            HostConfig hostConfig = new HostConfig();
+            if (containerPort != 0) 
             {
-                FromImage = "docker.data.techcollege.dk/hello-world",
-                Tag = "latest"
-            },
-            new AuthConfig(),
-            new Progress<JSONMessage>());
-            
+                exposedPort = new Dictionary<string, EmptyStruct>
+                    {
+                        {
+                            containerPort+"", default(EmptyStruct)
+                        }
+                    };
+                hostConfig.PortBindings = new Dictionary<string, IList<PortBinding>>
+                {
+                    {"8000", new List<PortBinding> {new PortBinding {HostPort = "8000"}}}
+                };
+                hostConfig.PublishAllPorts = true;
+            }
 
             var response = await client.Containers.CreateContainerAsync(new CreateContainerParameters
                 {
-                    Image = "docker.data.techcollege.dk/hello-world",
-                    ExposedPorts = new Dictionary<string, EmptyStruct>
-                    {
-                        {
-                            "8000", default(EmptyStruct)
-                        }
-                    },
-                    HostConfig = new HostConfig
-                    {
-                        PortBindings = new Dictionary<string, IList<PortBinding>>
-                        {
-                            {"8000", new List<PortBinding> {new PortBinding {HostPort = "8000"}}}
-                        },
-                        PublishAllPorts = true
-                    }
+                    Image = repo_image,
+                    ExposedPorts = exposedPort,
+                    HostConfig = hostConfig
                 });
 
 
             return "";
-            
-            //ContainerResponse response = new();
-            //return response;
         }
         public static string RunCmd(string image)
         {
@@ -81,7 +82,7 @@ namespace Constellation_WebApi
         {
 
         }
-        public static async void QueryContainer(string containerName)
+        public static async Task<ContainerListResponse> QueryContainer(string containerName)
         {
             DockerClient client = new DockerClientConfiguration()
               .CreateClient();
@@ -89,18 +90,20 @@ namespace Constellation_WebApi
                 IList<ContainerListResponse> containers = await client.Containers.ListContainersAsync(
                     new ContainersListParameters(){
                         Limit = 10,
-                    });
-
-                    foreach (var c in containers)
+                });
+                containerName = "/" + containerName;
+                foreach (var c in containers)
+                {
+                    foreach (var s in c.Names)
                     {
-                        foreach (var s in c.Names)
-                        {
-                            Console.WriteLine("Container. "+s);
-                        }
+                        if (s == containerName)
+                            return c;
                     }
-                    } catch {
-                        Console.WriteLine("Oh bugger");
-                    }
+                }
+            } catch {
+                Console.WriteLine("Oh bugger");
+            }
+            return null;
         }
         private static List<string> docker_command(string arguments)
         {

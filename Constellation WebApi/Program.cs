@@ -13,7 +13,7 @@ namespace Constellation_WebApi
     {
         public static void Main(string[] args)
         {
-            var test = typeof(ContainerHandler);
+            var init = typeof(ContainerHandler);
             CreateHostBuilder(args).Build().Run();
         }
 
