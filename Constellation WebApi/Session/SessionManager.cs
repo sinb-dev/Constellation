@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-namespace Constellation_WebApi.Session
+namespace Constellation_WebApi.SessionHandling
 {
     public static class SessionManager
     {

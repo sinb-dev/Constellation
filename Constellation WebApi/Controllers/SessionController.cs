@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Constellation_WebApi.Session
+using Constellation_WebApi.SessionHandling;
 using System.Threading.Tasks;
 
 namespace Constellation_WebApi.Controllers
@@ -23,7 +23,7 @@ namespace Constellation_WebApi.Controllers
             if (true)
             {
                 Session session = new();
-                SessionManager.Add()
+                SessionManager.Add(session);
             }
             return true;
         }
