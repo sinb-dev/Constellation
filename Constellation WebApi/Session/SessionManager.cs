@@ -1,17 +1,17 @@
 using System;
 using System.Collections.Generic;
-namespace Constellation_WebApi.Sesion
+namespace Constellation_WebApi.Session
 {
-    public class SessionManager
+    public static class SessionManager
     {
-        Dictionary<string, Session> sessions = new();
+        static Dictionary<string, Session> sessions = new();
         /// <summary>
         ///  Adds another session to the manager.
         /// </summary>
         /// <param name="num"></param>
         /// <returns></returns>
 
-        public void Add(Session session) {
+        public static void Add(Session session) {
             sessions[session.SessionId] = session;
         }
 
@@ -20,7 +20,7 @@ namespace Constellation_WebApi.Sesion
         /// </summary>
         /// <param name="string">The id of the user session</param>
         /// <returns>bool</returns>
-        public bool Check(string sessionId) {
+        public static bool Check(string sessionId) {
             if (!sessions.ContainsKey(sessionId))
             {
                 return false;

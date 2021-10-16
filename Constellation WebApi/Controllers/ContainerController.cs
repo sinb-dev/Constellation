@@ -1,6 +1,4 @@
-﻿using Docker.DotNet;
-using Docker.DotNet.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -24,38 +22,14 @@ namespace Constellation_WebApi.Controllers
             _logger = logger;
         }
 
-        /*[HttpGet]
-        public ContainerResponse Get(string myrequest="")
-        {
-            ContainerResponse response = new();
-            if (myrequest != "")
-                response.message = myrequest;
-            else
-                response.message = "Du er bare SÅ dygtig!!!";
-
-            
-            return response;
-        }*/
-
         [HttpGet]
         public async Task<ContainerResponse> Run(string userId, string image, int port)
         {
-            
-
-            var result = ContainerHandler.Run(image);
+            var result = ContainerHandler.Run(image, port, "Jensns");
             ContainerResponse response = new();
-            response.message = result.Result;
+            response.message = result;
             
             return response;
         }
-
-        /*[HttpGet]
-        public ContainerResponse Query(string containerName)
-        {
-            ContainerResponse response = new();
-            ContainerHandler.QueryContainer("Cont");
-            response.message = "hej";
-            return response;
-        }*/
     }
 }

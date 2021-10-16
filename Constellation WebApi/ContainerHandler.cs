@@ -1,128 +1,101 @@
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
-using Docker.DotNet;
-using Docker.DotNet.Models;
 using System.Threading.Tasks;
+using Ductus.FluentDocker;
+using Ductus.FluentDocker.Services;
+using System.Linq;
+using Ductus.FluentDocker.Builders;
+using System.Net.NetworkInformation;
 
 namespace Constellation_WebApi
 {
     public static class ContainerHandler
     {
-        static DockerClient client;
+        static IHostService client;
         static ContainerHandler() 
         {
-            if (System.Environment.OSVersion.Platform == PlatformID.Unix)
-            {
-                client = new DockerClientConfiguration(
-                    new Uri("unix:///var/run/docker.sock"))
-                    .CreateClient();
-            } 
-            else 
-            {
-                client = new DockerClientConfiguration(
-                    new Uri("npipe://./pipe/docker_engine"))
-                    .CreateClient();
-            }
+            var hosts = new Hosts().Discover();
+            client = hosts.FirstOrDefault(x=>x.IsNative) ?? hosts.FirstOrDefault(x => x.Name == "default");
         }
         const string REPOSITORY = "docker.data.techcollege.dk";
-
-        public static async Task<string> Run(string image)
+        //public static async Task<string> Run(string image, int container_port)
+        public static string Run(string image, int container_port, string container_name)
         {
-            await client.Images
-        .CreateImageAsync(new ImagesCreateParameters
+            image = sanitizeImageName(image);
+            int host_port = 0;
+            int lower_bound = 10000;
+            int upper_bound = 60000;
+            if (!getAvailablePortOS(out host_port, lower_bound, upper_bound)) 
             {
-                FromImage = "docker.data.techcollege.dk/hello-world",
-                Tag = "latest"
-            },
-            new AuthConfig(),
-            new Progress<JSONMessage>());
-            
+                return $"Failed to find an available port between {lower_bound} and {upper_bound}";
+            }
+            var builder = new Builder();
+            try
+            {
+                using (new Builder().UseContainer()
+                    .UseImage($"{REPOSITORY}/{image}")
+                    .WithName(container_name)
+                    .ExposePort(host_port,container_port)
+                    .Build()
+                    .Start()) {
 
-            var response = await client.Containers.CreateContainerAsync(new CreateContainerParameters
-                {
-                    Image = "docker.data.techcollege.dk/hello-world",
-                    ExposedPorts = new Dictionary<string, EmptyStruct>
-                    {
-                        {
-                            "8000", default(EmptyStruct)
-                        }
-                    },
-                    HostConfig = new HostConfig
-                    {
-                        PortBindings = new Dictionary<string, IList<PortBinding>>
-                        {
-                            {"8000", new List<PortBinding> {new PortBinding {HostPort = "8000"}}}
-                        },
-                        PublishAllPorts = true
-                    }
-                });
-
-
+                }
+            } 
+            catch (Exception e) 
+            {
+                return e.Message;
+            }
             return "";
-            
-            //ContainerResponse response = new();
-            //return response;
         }
-        public static string RunCmd(string image)
+
+        static bool getAvailablePortOS(out int port,int min, int max)
         {
-            string name = "Cont";
-            int internalPort = 8080;
-            int nextAvailablePort = 10000;
-
-            string arguments = $"run --rm --name {name} -p {internalPort}:{nextAvailablePort} {REPOSITORY}/{image}";
-
-            var output = docker_command(arguments);
-            Console.WriteLine("Container started");
-            QueryContainer(name);
-            return "";
+            HashSet<int> occupiedPorts = getOccupiedPorts();
+            while (occupiedPorts.Contains(min)) {
+                min++;
+                if (min > max) {
+                    port = -1;
+                    return false;
+                }
+            }
+            port = min;
+            return true;
         }
+        static HashSet<int> getOccupiedPorts() 
+        {
+            HashSet<int> list = new();
+            IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
+            TcpConnectionInformation[] tcpConnInfoArray = ipGlobalProperties.GetActiveTcpConnections();
+            foreach (TcpConnectionInformation tcpi in tcpConnInfoArray)
+            {
+                list.Add(tcpi.LocalEndPoint.Port);
+            }
+
+            var conts = client.GetContainers();
+            foreach (var c in conts) {
+                foreach (KeyValuePair<string, Ductus.FluentDocker.Model.Containers.HostIpEndpoint[]> kv in c.GetConfiguration().NetworkSettings.Ports) {
+                    foreach (var r in kv.Value)
+                    {
+                        list.Add(r.Port);
+                    }
+                }
+            }
+            return list;
+        }
+        private static string sanitizeImageName(string image)
+        {
+            return image
+                .Replace("/","")
+                .Replace("..", "")
+                .Replace(@"\","");
+            
+
+        }
+
         public static void Stop(string containerName)
         {
 
-        }
-        public static async void QueryContainer(string containerName)
-        {
-            DockerClient client = new DockerClientConfiguration()
-              .CreateClient();
-            try {
-                IList<ContainerListResponse> containers = await client.Containers.ListContainersAsync(
-                    new ContainersListParameters(){
-                        Limit = 10,
-                    });
-
-                    foreach (var c in containers)
-                    {
-                        foreach (var s in c.Names)
-                        {
-                            Console.WriteLine("Container. "+s);
-                        }
-                    }
-                    } catch {
-                        Console.WriteLine("Oh bugger");
-                    }
-        }
-        private static List<string> docker_command(string arguments)
-        {
-            List<string> output_lines = new List<string>();
-            var p = new Process 
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "docker",
-                    Arguments = arguments,
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    CreateNoWindow = true
-                }
-            };
-
-            p.Start();
-            while (!p.StandardOutput.EndOfStream)
-            {
-                output_lines.Add(p.StandardOutput.ReadLine());
-            }
-            return output_lines;
         }
     }
 }

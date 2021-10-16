@@ -1,6 +1,6 @@
 using System;
 
-namespace Constellation_WebApi.Sesion
+namespace Constellation_WebApi.SessionHandling
 {
     public class Session
     {
@@ -10,10 +10,11 @@ namespace Constellation_WebApi.Sesion
         public string SessionId {get;set;}
         public DateTime LastUpdated {get;set;}
 
-        public Session() 
+        public Session() : this(DateTime.Now) {}
+        public Session(DateTime lastUpdated) 
         {
             SessionId = CreateSessionId();
-            LastUpdated = DateTime.Now;
+            LastUpdated = lastUpdated;
         }
 
         public static string CreateSessionId()
