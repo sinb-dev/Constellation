@@ -18,14 +18,22 @@ namespace Constellation_WebApi.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<bool> Login(string username, string password) 
+        public async Task<LoginResponse> Login(string username, string password) 
         {
             if (true)
             {
                 Session session = new();
                 SessionManager.Add(session);
+                return LoginResponse.Success(session.SessionId);
             }
-            return true;
+            return LoginResponse.Failed();
+        }
+        public class LoginResponse
+        {
+            public string Message {get;set;}
+            public string SessionId {get;set;}
+            public static LoginResponse Success(string sessionId) => new LoginResponse() {Message = "OK", SessionId = sessionId };
+            public static LoginResponse Failed() => new LoginResponse() {Message = "Login failed", SessionId = "" };
         }
     }
 }

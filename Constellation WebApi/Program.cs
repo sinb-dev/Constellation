@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
+using Constellation_WebApi.SessionHandling;
 namespace Constellation_WebApi
 {
     public class Program
@@ -15,9 +15,9 @@ namespace Constellation_WebApi
         {
 
             //ContainerHandler.Run("possum", 8080, "possum");
+            UserManager.Login("hoxer","something");
             
-            Console.WriteLine();
-            CreateHostBuilder(args).Build().Run();
+//            CreateHostBuilder(args).Build().Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

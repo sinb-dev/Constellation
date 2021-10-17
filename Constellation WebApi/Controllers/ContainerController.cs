@@ -24,9 +24,9 @@ namespace Constellation_WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ContainerResponse> Run(string userId, string image, int port)
+        public ContainerResponse Run(string userId, string image, int port, string name)
         {
-            var result = ContainerHandler.Run(image, port, "Jensns");
+            var result = ContainerHandler.Run(image, port, name);
             ContainerResponse response = new();
             response.message = result;
             
