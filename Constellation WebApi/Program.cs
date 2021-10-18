@@ -11,11 +11,12 @@ namespace Constellation_WebApi
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
 
             //ContainerHandler.Run("possum", 8080, "possum");
-            UserManager.Login("hoxer","something");
+            Console.WriteLine("ælaksjdf");
+            await UserManager.Login("hoxer","something");
             
 //            CreateHostBuilder(args).Build().Run();
         }
