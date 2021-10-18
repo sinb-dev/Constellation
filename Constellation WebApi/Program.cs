@@ -15,8 +15,9 @@ namespace Constellation_WebApi
         public static async Task Main(string[] args)
         {
             //ContainerHandler.Run("possum", 8080, "possum");
-            await UserManager.Create("Anne","dam", "H4PD101121");
-            var result = await UserManager.Login("Anne","Dam");
+            Console.WriteLine(UserManager.Hex("Anne_H4PD101121"));
+            //await UserManager.Create("Anne","dam", "H4PD101121");
+            //var result = await UserManager.Login("Anne","Dam");
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

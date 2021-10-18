@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ namespace Constellation_WebApi
 {
     public class CouchDB
     {
-        const string host = "http://sofa.hoxer.net:5984/";
+        const string host = "https://sofa.hoxer.net:6984/";
         static readonly HttpClient client = new HttpClient(new HttpClientHandler(){
             Credentials = new NetworkCredential("admin", "123hemlig"),
         });
@@ -73,18 +74,32 @@ namespace Constellation_WebApi
                 return default(T);
             }
         }
-
+        public static async Task<bool> CreateUser(string username, string password)
+        {
+            
+            string request = $"{host}_users/org.couchdb.user:{username}";
+            UserDocument doc = new UserDocument() {
+                name        = username,
+                password    = password,
+                type        = "user"
+            };
+            JsonContent content = JsonContent.Create(doc);
+            
+            HttpResponseMessage response = await client.PutAsync(request,content);
+            return true;
+        }
     }
     public abstract class Document {
         public abstract string _id {get;set;}
     }
     public class UserDocument : Document
     {
-        public override string _id {get {return username;}set { username = value;}}
-        public string username {get;set;}
+        public override string _id {get {return name;}set { name = value;}}
+        public string name {get;set;}
         public string password {get;set;}
-        public string course {get;set;}
-        public int type {get;set;}
+        //public string course {get;set;}
+        public string type {get;set;}
+        public List<string> roles {get;set;} = new();
         public static async Task<UserDocument> Load(string username)
         {
             UserDocument doc = null;

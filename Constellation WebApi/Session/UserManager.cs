@@ -26,17 +26,16 @@ namespace Constellation_WebApi.SessionHandling
         }
         public static async Task<bool> Create(string username, string password, string course)
         {
-            //Should have been hashed much earlier (like on the client side, but we'll get there)
-            password = hash(username+password);
+            if (username.IndexOf('_') != -1) 
+            {
+                Logger.Log("Attempted to create user {username} but it contains illegal character '_'");
+                return false;
+            }
 
-            UserDocument user = new UserDocument() {
-                username = username,
-                password = password,
-                type = 0,
-                course = course
-            };
+            //Should have been hashed much earlier (like on the client side, but we'll get there)
+            //password = hash(username+password);
             
-            var response = await CouchDB.Put("users", user);
+            var response = await CouchDB.CreateUser($"{username}_{course}", password);
             return true;
         }
         static string hash(string input)
@@ -48,6 +47,13 @@ namespace Constellation_WebApi.SessionHandling
                 sb.Append(x.ToString("X2"));
             }
             return sb.ToString();
+        }
+        public static string Hex(string text) 
+        {
+            
+            byte[] ba = System.Text.Encoding.Default.GetBytes(text);
+            var hexString = BitConverter.ToString(ba);
+            return hexString.Replace("-","");
         }
     }
 }
