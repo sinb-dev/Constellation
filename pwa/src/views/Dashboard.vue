@@ -12,7 +12,10 @@
 <script setup>
 import axios from 'axios'
 import { ref } from 'vue'
-//var label = ref("CORS I RØVEN");
+import Constellation from '../scripts/Constellation'
+Constellation.checkSetup()
+
+
 var image = ref("");
 var port = ref(0);
 var userId = ref("");
@@ -27,7 +30,6 @@ function runContainer()
       +"&port="+port.value)
     .then(response => console.log(response.data.id))
 }
-
 
 </script>
 
