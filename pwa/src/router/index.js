@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Dashboard from '../views/Dashboard.vue'
 import Setup from '../views/Setup.vue'
+import AddContainerDefinition from '../views/AddContainerDefinition.vue'
 
 const routes = [
   {
@@ -12,6 +13,11 @@ const routes = [
     path: '/setup',
     name: 'Setup',
     component: Setup
+  },
+  {
+    path: '/add/container-def',
+    name: 'Container definition',
+    component: AddContainerDefinition
   },
   {
     path: '/about',

@@ -1,10 +1,10 @@
 <template>
-  <q-layout view="hHh lpR fFf" >
+  <q-layout view="hHh lpR fFf" class="row justify-center" >
 
     <q-header elevated class="bg-primary text-white">
       <q-toolbar>
         <q-toolbar-title>
-          <q-avatar icon="view_in_ar" size="64px">
+          <q-avatar icon="ion-square" size="64px">
             <!--<img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg">-->
             
           </q-avatar>
@@ -15,11 +15,15 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer show-if-above v-model="rightDrawerOpen" side="right" bordered>
+    <q-drawer show-if-above v-model="rightDrawerOpen" side="right" bordered dark>
       <!-- drawer content -->
+      
+      more or less<br>more or less<br>
+      more or less<br>more or less<br>more or less<br>more or less<br>more or less<br>more or less<br>more or less<br>more or less<br>more or less<br>more or less<br>more or less<br>more or less<br>more or less<br>more or less<br>more or less<br>more or less<br>more or less<br>
+      
     </q-drawer>
 
-    <q-page-container class="fixed-center" style="padding-top:500px">
+    <q-page-container class="col-md-8 col-sm-8 col-xs-12" >
       <router-view />
     </q-page-container>
 
@@ -30,10 +34,10 @@
 //import store from '@/store'
 import { ref } from 'vue'
 
-
 const rightDrawerOpen = ref(false)
 
 function toggleRightDrawer () {
   rightDrawerOpen.value = !rightDrawerOpen.value
 }
+
 </script>
