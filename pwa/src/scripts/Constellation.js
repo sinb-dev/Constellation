@@ -10,7 +10,7 @@ export default {
         })
         .catch(function(e) {
             console.error(e);
-            document.location.href="/setup"
+            //document.location.href="/setup"
         })
     }
 }

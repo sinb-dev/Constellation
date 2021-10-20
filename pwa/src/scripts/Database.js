@@ -22,10 +22,12 @@ export default {
     sync() {
         let username = configuration.username + "_" + configuration.course;
         //let password = SHA1.SHA1(configuration.password);
-        let dbname = this.getCouchDBName();
+        let dbname = "userdb-416e6e655f48345044313031313231"//this.getCouchDBName();
+        configuration.password = "dam"
         let uri = 'https://'+username+":"+configuration.password+"@"+couchdb_host+":6984/"+dbname
+        //uri= 'http://admin:123hemlig@'+couchdb_host+":5984/test"
         console.log(uri);
-        db.sync('constellation', uri);
+        PouchDB.sync(uri,db);
     }
     
 }
