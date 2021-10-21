@@ -1,4 +1,5 @@
 <template>
+<h2>{{store.username}}</h2>
    <q-form
       @submit="onSubmit"
       @reset="onReset"
@@ -6,7 +7,7 @@
     >
       <q-input
         filled
-        v-model="username"
+        v-model="store.username"
         label="Username"
         hint="eg. Konrad"
         lazy-rules
@@ -15,7 +16,7 @@
 
       <q-input
         filled
-        v-model="password"
+        v-model="store.password"
         type="password"
         label="Password"
         lazy-rules
@@ -26,7 +27,7 @@
 
       <q-input
         filled
-        v-model="course"
+        v-model="store.course"
         label="Course"
         hint="eg. H3PD011121"
         lazy-rules
@@ -42,24 +43,47 @@
 </template>
 
 <script setup>
-//import { useQuasar } from 'quasar'
-import { ref } from 'vue'
+
 const PouchDB = require("pouchdb-browser").default;
-//import store from '@/store'
+//import Encryption from '../scripts/Encryption.js'
+import store from '@/store'
 
 //const $q = useQuasar()
 
-const username = ref(null)
+/*const username = ref(null)
 const password = ref(null)
-const course = ref(null)
+const course = ref(null)*/
 
 var db = new PouchDB("constellation");
+
+db.get('user')
+  .then((doc) => {
+    console.log(doc)
+    store.username.value = doc.username,
+    store.password.value = doc.password,
+    store.course.value = doc.course
+
+  })
+  .catch((e) => {console.log("Creating new user");console.log(e)})
+
 function onSubmit () {
+  saveUser(store.username.value, store.password.value, store.course.value, [{
+        image : "hello-world",
+        /*ports : {
+          '8080' : 1000
+        },*/
+        prefix : "hello-world"
+      }])
+}
+function saveUser(uname, pword, course, condef) 
+{
   db.put({
     _id : "user",
-    username : username.value,
-    password : password.value,
-    course : course.value
+    username : uname,
+    //password : Encryption.SHA1(password.value),
+    password : pword,
+    course : course,
+    container_definitions : condef
   })
 
 //  db.sync('constellation', 'https://localhost:5984/mydb');

@@ -15,6 +15,7 @@
     
   <div class="q-pa-md q-gutter-sm row justify-end">
     <q-btn color="primary" label="New container" icon="add" to="/add/container-def" />
+    <q-btn color="primary"  icon="settings" to="/setup" />
   </div>
     <q-list bordered padding full-width class="rounded-borders">
       <q-item-label header>Container definitions</q-item-label>

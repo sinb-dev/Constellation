@@ -32,5 +32,12 @@ namespace Constellation_WebApi.Controllers
             
             return response;
         }
+
+        [HttpGet]
+        public string Command(string arguments)
+        {
+            System.Diagnostics.Process.Start("docker",arguments);
+            return "OK";
+        }
     }
 }
