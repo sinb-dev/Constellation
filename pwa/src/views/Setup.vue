@@ -1,5 +1,5 @@
 <template>
-<h2>{{store.username}}</h2>
+<h2>Revision</h2>
    <q-form
       @submit="onSubmit"
       @reset="onReset"
@@ -7,7 +7,7 @@
     >
       <q-input
         filled
-        v-model="store.state.username"
+        v-model="store.state.user.username"
         label="Username"
         hint="eg. Konrad"
         lazy-rules
@@ -16,7 +16,7 @@
 
       <q-input
         filled
-        v-model="store.state.password"
+        v-model="store.state.user.password"
         type="password"
         label="Password"
         lazy-rules
@@ -27,7 +27,7 @@
 
       <q-input
         filled
-        v-model="store.state.course"
+        v-model="store.state.user.course"
         label="Course"
         hint="eg. H3PD011121"
         lazy-rules
@@ -46,17 +46,17 @@
 
 <script setup>
 
-const PouchDB = require("pouchdb-browser").default;
+//const PouchDB = require("pouchdb-browser").default;
 //import Encryption from '../scripts/Encryption.js'
 import store from '@/store'
-
+import Database from '../scripts/Database.js'
 //const $q = useQuasar()
 
 /*const username = ref(null)
 const password = ref(null)
 const course = ref(null)*/
 
-var db = new PouchDB("constellation");
+//var db = new PouchDB("constellation");
 
 /*db.get('user')
   .then((doc) => {
@@ -76,22 +76,9 @@ var db = new PouchDB("constellation");
   })*/
 
 function onSubmit () {
-  saveUser()
+  Database.saveData()
 }
-function saveUser() 
-{
-  db.put({
-    _id : "user",
-    _rev : store.state._rev,
-    username : store.state.username,
-    password : store.state.password,
-    course : store.state.course,
-    container_definitions : store.state.container_definitions
-  })
 
-//  db.sync('constellation', 'https://localhost:5984/mydb');
-
-}
 </script>
 
 <style>

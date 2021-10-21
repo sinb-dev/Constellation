@@ -27,7 +27,7 @@
       <q-input
         filled
         type="number"
-        v-model="age"
+        v-model="port"
         label="Container port"
         lazy-rules
         :rules="[
@@ -38,7 +38,8 @@
 
       <div>
         <q-btn label="Submit" type="submit" color="primary"/>
-        <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
+        &nbsp;
+        <q-btn label="Back" to="/" color="grey"/>
       </div>
     </q-form>
 
@@ -46,39 +47,40 @@
 
 <script setup>
 
-import { useQuasar } from 'quasar'
 import { ref } from 'vue'
+import store from '@/store'
+import Database from '../scripts/Database.js'
 
-const $q = useQuasar()
 
-const name = ref(null)
-const age = ref(null)
-const accept = ref(false)
+const image = ref(null)
+const port = ref(null)
+const prefix = ref(null)
 
 function onSubmit () {
-    if (accept.value !== true) {
-        $q.notify({
-        color: 'red-5',
-        textColor: 'white',
-        icon: 'warning',
-        message: 'You need to accept the license and terms first'
-        })
-    }
-    else {
+  saveContainerDef()
+    //if (accept.value !== true) {
+
+    //}
+    /*else {
         $q.notify({
         color: 'green-4',
         textColor: 'white',
         icon: 'cloud_done',
         message: 'Submitted'
         })
-    }
+    }*/
 }
-
-function onReset () {
-    name.value = null
-    age.value = null
-    accept.value = false
-    
+function saveContainerDef()
+{
+  store.state.user.container_definitions.push(
+    {
+        image : image.value,
+        prefix : prefix.value,
+        port : port.value
+      }
+  )
+  Database.saveData()
+  
 }
 
 

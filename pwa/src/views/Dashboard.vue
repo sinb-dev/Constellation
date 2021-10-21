@@ -11,7 +11,7 @@
 
     <p>Mauris et ipsum tincidunt, scelerisque quam ac, venenatis ipsum. In hac habitasse platea dictumst. Fusce vitae odio a urna ornare gravida. Maecenas ac auctor sapien. Donec et lacinia ligula. Mauris ut nisi efficitur, placerat purus a, vulputate nulla. Nullam sollicitudin ante molestie, accumsan nibh et, egestas diam. Curabitur dapibus laoreet lacus, eu tempor augue ornare eu. Quisque tempor accumsan ipsum, sed feugiat ipsum vestibulum sit amet. In hac habitasse platea dictumst. Nunc gravida suscipit ligula, sit amet facilisis elit aliquet id. Nulla purus massa, ornare sit amet metus aliquam, porta congue sapien. Nullam ullamcorper ac elit eget pulvinar. Cras eu lacus iaculis, rutrum lectus luctus, finibus magna. Pellentesque porta vitae ipsum ac vestibulum. Maecenas pellentesque maximus ipsum in maximus. </p>
     <p>sdf</p>-->
-    {{store.container_definitions}}
+    
     
   <div class="q-pa-md q-gutter-sm row justify-end">
     <q-btn color="primary" label="New container" icon="add" to="/add/container-def" />
@@ -20,7 +20,7 @@
     <q-list bordered padding full-width class="rounded-borders">
       <q-item-label header>Container definitions</q-item-label>
 
-      <q-item clickable v-ripple v-for="container in store.state.container_definitions"
+      <q-item  v-for="container in store.state.user.container_definitions"
         v-bind:container="container"
         v-bind:key="container.name">
         <q-item-section avatar top>
@@ -33,7 +33,10 @@
         </q-item-section>
 
         <q-item-section side>
-          <q-icon name="play_arrow" color="green" />
+          <!--<q-icon clickable name="play_arrow" color="primary" />-->
+          <q-btn-group>
+            <q-btn color="green"  icon="play_arrow" />
+          </q-btn-group>
         </q-item-section>
       </q-item>
      
