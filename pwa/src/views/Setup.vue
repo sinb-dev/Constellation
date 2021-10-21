@@ -7,7 +7,7 @@
     >
       <q-input
         filled
-        v-model="store.username"
+        v-model="store.state.username"
         label="Username"
         hint="eg. Konrad"
         lazy-rules
@@ -16,7 +16,7 @@
 
       <q-input
         filled
-        v-model="store.password"
+        v-model="store.state.password"
         type="password"
         label="Password"
         lazy-rules
@@ -27,7 +27,7 @@
 
       <q-input
         filled
-        v-model="store.course"
+        v-model="store.state.course"
         label="Course"
         hint="eg. H3PD011121"
         lazy-rules
@@ -37,7 +37,9 @@
       />
 
       <div>
-        <q-btn label="Login" type="submit" color="primary"/>
+        <q-btn label="Save" type="submit" color="primary"/>
+        &nbsp;
+        <q-btn label="Back" to="/" color="grey"/>
       </div>
     </q-form>
 </template>
@@ -56,34 +58,35 @@ const course = ref(null)*/
 
 var db = new PouchDB("constellation");
 
-db.get('user')
+/*db.get('user')
   .then((doc) => {
-    console.log(doc)
-    store.username.value = doc.username,
-    store.password.value = doc.password,
-    store.course.value = doc.course
-
+    store.state.username = doc.username,
+    store.state.password = doc.password,
+    store.state.course = doc.course
+    store.state.container_definitions = doc.container_definitions;
+    store.state._rev = doc._rev;
   })
-  .catch((e) => {console.log("Creating new user");console.log(e)})
+  .catch(() => {
+    
+    //Initialize container_definition with some example
+    store.state.container_definitions = [{
+        image : "hello-world",
+        prefix : "hello-world"
+      }];
+  })*/
 
 function onSubmit () {
-  saveUser(store.username.value, store.password.value, store.course.value, [{
-        image : "hello-world",
-        /*ports : {
-          '8080' : 1000
-        },*/
-        prefix : "hello-world"
-      }])
+  saveUser()
 }
-function saveUser(uname, pword, course, condef) 
+function saveUser() 
 {
   db.put({
     _id : "user",
-    username : uname,
-    //password : Encryption.SHA1(password.value),
-    password : pword,
-    course : course,
-    container_definitions : condef
+    _rev : store.state._rev,
+    username : store.state.username,
+    password : store.state.password,
+    course : store.state.course,
+    container_definitions : store.state.container_definitions
   })
 
 //  db.sync('constellation', 'https://localhost:5984/mydb');
