@@ -74,42 +74,77 @@ namespace Constellation_WebApi
                 return default(T);
             }
         }
-        public static async Task<bool> CreateUser(string username, string password)
+        
+        public static async Task<bool> DeleteUser(string id)
         {
+            string request = $"{host}_users/org.couchdb.user:{id}";
+            HttpResponseMessage response = await client.DeleteAsync(request);
+            return response.StatusCode == HttpStatusCode.OK;
+        }
+        public static async Task<bool> UpdateUser(string id, string password)
+        {
+            //First find the database user
+            string request = $"{host}_users/org.couchdb.user:{id}";
+
+            UserDocument doc = await UserDocument.Load(id);
+            if (string.IsNullOrEmpty(doc.name))
+            {
+                return false;
+            }
+            doc.password = password;
+            JsonSerializerOptions options  = new() {
+                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+            };
+            JsonContent content = JsonContent.Create(doc, null, options);
             
-            string request = $"{host}_users/org.couchdb.user:{username}";
+            HttpResponseMessage response = await client.PutAsync(request,content);
+
+            return response.StatusCode == HttpStatusCode.Created;
+        }
+
+        public static async Task<bool> CreateUser(string id, string password, bool admin)
+        {
+            //First create the database user
+            string request = $"{host}_users/org.couchdb.user:{id}";
+            List<string> roles = admin ? new List<string>{ "user", "admin" } : new List<string>{"user"};
+            string type = admin ? "admin" : "user";
             UserDocument doc = new UserDocument() {
-                name        = username,
+                name        = id,
                 password    = password,
-                type        = "user"
+                type        = type,
+                roles       = roles
             };
             JsonContent content = JsonContent.Create(doc);
             
             HttpResponseMessage response = await client.PutAsync(request,content);
-            return true;
+
+            return response.StatusCode == HttpStatusCode.Created;
         }
     }
     public abstract class Document {
         public abstract string _id {get;set;}
+        public abstract string _rev {get;set;}
     }
     public class UserDocument : Document
     {
-        public override string _id {get {return name;}set { name = value;}}
+        
+        public override string _id {get;set;}
+        public override string _rev {get;set;}
         public string name {get;set;}
         public string password {get;set;}
-        //public string course {get;set;}
         public string type {get;set;}
         public List<string> roles {get;set;} = new();
-        public static async Task<UserDocument> Load(string username)
+        public static async Task<UserDocument> Load(string id)
         {
             UserDocument doc = null;
+            id = $"org.couchdb.user:{id}";
             try
             {
-                doc = await CouchDB.GetDoc<UserDocument>("users",username);
+                doc = await CouchDB.GetDoc<UserDocument>("_users",id);
             }
             catch(Exception e)
             {
-                Logger.Error($"Could not retrieve user document for {username}",e);
+                Logger.Error($"Could not retrieve user document for {id}",e);
             }
             return doc;
         }

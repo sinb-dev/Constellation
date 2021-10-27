@@ -34,9 +34,18 @@ namespace Constellation_WebApi.SessionHandling
 
             //Should have been hashed much earlier (like on the client side, but we'll get there)
             //password = hash(username+password);
+            var isAdmin = course == "teacher";
             
-            var response = await CouchDB.CreateUser($"{username}_{course}", password);
+            var response = await CouchDB.CreateUser($"{username}_{course}", password, isAdmin);
             return true;
+        }
+        public static async Task<bool> Update(string id, string password)
+        {
+            return await CouchDB.UpdateUser(id, password);
+        }
+        public static async Task<bool> Remove(string id)
+        {
+            return await CouchDB.DeleteUser(id);
         }
         static string hash(string input)
         {

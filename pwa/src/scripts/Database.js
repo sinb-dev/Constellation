@@ -32,7 +32,7 @@ export default {
             password : store.state.user.password,
             course : store.state.user.course,
             container_definitions : store.state.user.container_definitions
-        }).then(()=>this.loadData())
+        })
 
     //  db.sync('constellation', 'https://localhost:5984/mydb');
 

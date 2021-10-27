@@ -1,5 +1,5 @@
 <template>
-<h2>Revision</h2>
+<h2>Configuration</h2>
    <q-form
       @submit="onSubmit"
       @reset="onReset"
@@ -76,7 +76,12 @@ const course = ref(null)*/
   })*/
 
 function onSubmit () {
-  Database.saveData()
+  Database.saveData().then(
+    () => {
+      Database.LoadData();
+      require("../router/index.js").default.push("/")
+    }
+  )
 }
 
 </script>
