@@ -77,7 +77,14 @@ namespace Constellation_WebApi
         
         public static async Task<bool> DeleteUser(string id)
         {
-            string request = $"{host}_users/org.couchdb.user:{id}";
+            
+
+            UserDocument doc = await UserDocument.Load(id);
+            if (string.IsNullOrEmpty(doc.name))
+            {
+                return false;
+            }
+            string request = $"{host}_users/org.couchdb.user:{id}?rev="+doc._rev;
             HttpResponseMessage response = await client.DeleteAsync(request);
             return response.StatusCode == HttpStatusCode.OK;
         }
@@ -92,10 +99,8 @@ namespace Constellation_WebApi
                 return false;
             }
             doc.password = password;
-            JsonSerializerOptions options  = new() {
-                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-            };
-            JsonContent content = JsonContent.Create(doc, null, options);
+
+            JsonContent content = JsonContent.Create(doc);
             
             HttpResponseMessage response = await client.PutAsync(request,content);
 
@@ -114,7 +119,11 @@ namespace Constellation_WebApi
                 type        = type,
                 roles       = roles
             };
-            JsonContent content = JsonContent.Create(doc);
+
+            JsonSerializerOptions options  = new() {
+                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+            };
+            JsonContent content = JsonContent.Create(doc,null,options);
             
             HttpResponseMessage response = await client.PutAsync(request,content);
 
