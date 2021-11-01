@@ -167,6 +167,11 @@ namespace Constellation_WebApi
 
             return response.StatusCode == HttpStatusCode.Created;
         }
+
+        public static async void GetContainerDefinitions() 
+        {
+            
+        }
     }
     public class QueryResponse<T> {
         public List<T> docs {get;set;}
@@ -177,7 +182,6 @@ namespace Constellation_WebApi
     }
     public class UserDocument : Document
     {
-        
         public override string _id {get;set;}
         public override string _rev {get;set;}
         public string name {get;set;}
@@ -198,5 +202,22 @@ namespace Constellation_WebApi
             }
             return doc;
         }
+    }
+    public class ConfigurationDocument : Document
+    {
+        public override string _id {get;set;}
+        public override string _rev {get;set;}
+        public string username {get;set;}
+        public string password {get;set;}
+        public string course {get;set;}
+        public List<ContainerDefinition> container_defititions {get;set;} = new List<ContainerDefinition>();
+
+
+    }
+    public class ContainerDefinition
+    {
+        public string image {get;set;}
+        public string prefix {get;set;}
+        public int port {get;set;}
     }
 }
