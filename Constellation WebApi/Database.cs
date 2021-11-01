@@ -6,16 +6,17 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using System.Net;
 using System.Net.Http.Headers;
+using CouchDB.Client.FluentMango;
 
 namespace Constellation_WebApi
 {
-    public class CouchDB
+    public class Database
     {
         const string host = "https://sofa.hoxer.net:6984/";
         static readonly HttpClient client = new HttpClient(new HttpClientHandler(){
             Credentials = new NetworkCredential("admin", "123hemlig"),
         });
-        static CouchDB()
+        static Database()
         {
             var encoded = Convert.ToBase64String( System.Text.Encoding.ASCII.GetBytes(
                 String.Format( "{0}:{1}", "admin", "123hemlig" ) ) );
@@ -74,11 +75,48 @@ namespace Constellation_WebApi
                 return default(T);
             }
         }
-        
-        public static async Task<bool> DeleteUser(string id)
+
+
+        public static async Task<List<T>> GetList<T>(string database, string query) 
         {
             
+            List<T> result = new List<T>();
+            try 
+            {
+                string request = $"{host}{database}/_find";
+                StringContent content = new StringContent(Query());
+                content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+                
+                HttpResponseMessage response = await client.PostAsync(request,content);
+                string responseText = await response.Content.ReadAsStringAsync();
+                QueryResponse<T> queryResponse = JsonSerializer.Deserialize<QueryResponse<T>>(responseText) ;
+                result = queryResponse.docs;
+            }
+            catch(HttpRequestException e)
+            {
+                Console.WriteLine("Request failed: "+e.Message);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("Error: "+e.Message);
+            }
+            return result;
+        }
+        public static async Task<List<UserDocument>> ListUsers()
+        {
+            return await GetList<UserDocument>("_users", Query());
+        }
+        public static string Query()
+        {
+            
+            var query = new FindBuilder()
+                .AddSelector("roles", SelectorOperator.In, new string[] {"user" });
+            
+            return query.ToString();
 
+        }
+        public static async Task<bool> DeleteUser(string id)
+        {
             UserDocument doc = await UserDocument.Load(id);
             if (string.IsNullOrEmpty(doc.name))
             {
@@ -130,6 +168,9 @@ namespace Constellation_WebApi
             return response.StatusCode == HttpStatusCode.Created;
         }
     }
+    public class QueryResponse<T> {
+        public List<T> docs {get;set;}
+    }
     public abstract class Document {
         public abstract string _id {get;set;}
         public abstract string _rev {get;set;}
@@ -149,7 +190,7 @@ namespace Constellation_WebApi
             id = $"org.couchdb.user:{id}";
             try
             {
-                doc = await CouchDB.GetDoc<UserDocument>("_users",id);
+                doc = await Database.GetDoc<UserDocument>("_users",id);
             }
             catch(Exception e)
             {

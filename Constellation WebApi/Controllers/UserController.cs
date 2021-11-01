@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Constellation_WebApi.SessionHandling;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Constellation_WebApi.Controllers
 {
@@ -34,5 +35,12 @@ namespace Constellation_WebApi.Controllers
         {
             return await UserManager.Remove(id);
         }
+
+        [HttpPost("list")]
+        public async Task<List<UserDocument>> list() 
+        {
+            return await UserManager.List();
+        }
     }
+    
 }
