@@ -15,6 +15,11 @@ const routes = [
     component: Setup
   },
   {
+    path: '/container/:id',
+    name: "Edit container",
+    component: AddContainerDefinition
+  },
+  {
     path: '/add/container-def',
     name: 'Container definition',
     component: AddContainerDefinition

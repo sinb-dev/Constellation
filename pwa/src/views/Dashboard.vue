@@ -20,7 +20,7 @@
     <q-list bordered padding full-width class="rounded-borders">
       <q-item-label header>Container definitions</q-item-label>
 
-      <q-item  v-for="container in store.state.user.container_definitions"
+      <q-item @click="editContainerDefinition(container)" clickable v-ripple v-for="container in store.state.user.container_definitions"
         v-bind:container="container"
         v-bind:key="container.name">
         <q-item-section avatar top>
@@ -36,6 +36,7 @@
           <!--<q-icon clickable name="play_arrow" color="primary" />-->
           <q-btn-group>
             <q-btn color="green"  icon="play_arrow" />
+            <!--<q-btn color="red"  icon="stop" />-->
           </q-btn-group>
         </q-item-section>
       </q-item>
@@ -50,7 +51,10 @@
 import store from '@/store'
 import Constellation from '../scripts/Constellation'
 Constellation.checkSetup()
-
+function editContainerDefinition(container){
+  var url = container.image+"_"+container.prefix
+  require("../router/index.js").default.push("/container/"+url)
+}
 
 </script>
 
