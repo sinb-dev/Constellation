@@ -56,7 +56,6 @@ namespace Constellation_WebApi
 
         public static async Task<T> GetDoc<T>(string database, string id)
         {
-           
             try 
             {
                 string request = $"{host}{database}/{id}";
@@ -167,11 +166,6 @@ namespace Constellation_WebApi
 
             return response.StatusCode == HttpStatusCode.Created;
         }
-
-        public static async void GetContainerDefinitions() 
-        {
-            
-        }
     }
     public class QueryResponse<T> {
         public List<T> docs {get;set;}
@@ -211,7 +205,6 @@ namespace Constellation_WebApi
         public string password {get;set;}
         public string course {get;set;}
         public List<ContainerDefinition> container_defititions {get;set;} = new List<ContainerDefinition>();
-
 
     }
     public class ContainerDefinition
