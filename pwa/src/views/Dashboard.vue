@@ -35,7 +35,7 @@
         <q-item-section side>
           <!--<q-icon clickable name="play_arrow" color="primary" />-->
           <q-btn-group>
-            <q-btn color="green"  icon="play_arrow" />
+            <q-btn color="green" icon="play_arrow" @click="startContainer"/>
           </q-btn-group>
         </q-item-section>
       </q-item>
@@ -45,11 +45,19 @@
 </template>
 
 <script setup>
-//import axios from 'axios'
+const host = "http://localhost:5000/Container/run?userId=Anne_H4PD101121&prefix=possum"
+import axios from 'axios'
 //import { ref } from 'vue'
 import store from '@/store'
 import Constellation from '../scripts/Constellation'
 Constellation.checkSetup()
+
+ 
+function startContainer() {
+    axios.get(host).then(response =>
+      console.log("Container run successfully: "+response)
+    )
+  }
 
 
 </script>

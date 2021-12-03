@@ -14,6 +14,13 @@ namespace Constellation_WebApi
     {
         public static async Task Main(string[] args)
         {
+            /*var defs = UserManager.GetContainerDefinitions("Anne","H4PD101121").Result;
+            foreach (var d in defs) {
+                if (d.prefix == "possum") {
+                    ContainerHandler.Run($"Anne_H4PD101121", d);
+                }
+            }*/
+            ContainerHandler.GetStatus("Anne_H4PD101121");
             CreateHostBuilder(args).Build().Run();
         }
 

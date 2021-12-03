@@ -42,7 +42,6 @@
         <q-btn label="Back" to="/" color="grey"/>
       </div>
     </q-form>
-
 </template>
 
 <script setup>
@@ -72,11 +71,14 @@ function onSubmit () {
 }
 function saveContainerDef()
 {
+  if (store.state.user.container_definitions == undefined) {
+    store.state.user.container_definitions = [];
+  }
   store.state.user.container_definitions.push(
     {
         image : image.value,
         prefix : prefix.value,
-        port : port.value
+        port : parseInt(port.value)
       }
   );
   Database.saveData().then(

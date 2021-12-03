@@ -50,30 +50,7 @@
 //import Encryption from '../scripts/Encryption.js'
 import store from '@/store'
 import Database from '../scripts/Database.js'
-//const $q = useQuasar()
 
-/*const username = ref(null)
-const password = ref(null)
-const course = ref(null)*/
-
-//var db = new PouchDB("constellation");
-
-/*db.get('user')
-  .then((doc) => {
-    store.state.username = doc.username,
-    store.state.password = doc.password,
-    store.state.course = doc.course
-    store.state.container_definitions = doc.container_definitions;
-    store.state._rev = doc._rev;
-  })
-  .catch(() => {
-    
-    //Initialize container_definition with some example
-    store.state.container_definitions = [{
-        image : "hello-world",
-        prefix : "hello-world"
-      }];
-  })*/
 
 function onSubmit () {
   Database.saveData().then(

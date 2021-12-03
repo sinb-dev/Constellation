@@ -7,6 +7,7 @@ using Ductus.FluentDocker.Services;
 using System.Linq;
 using Ductus.FluentDocker.Builders;
 using System.Net.NetworkInformation;
+using Constellation_WebApi.SessionHandling;
 
 namespace Constellation_WebApi
 {
@@ -20,6 +21,15 @@ namespace Constellation_WebApi
         }
         const string REPOSITORY = "docker.data.techcollege.dk";
         //public static async Task<string> Run(string image, int container_port)
+        public static string Run(string userId, ContainerDefinition conDef) 
+        {
+            if (conDef == null) {
+                Logger.Error($"Attempted to run container for userId, but the container definition was null");
+                return "error";
+            }
+            return Run(conDef.image, conDef.port,
+                $"{conDef.prefix}_{userId}");
+        }
         public static string Run(string image, int container_port, string container_name)
         {
             image = sanitizeImageName(image);
@@ -33,20 +43,54 @@ namespace Constellation_WebApi
             var builder = new Builder();
             try
             {
-                using (new Builder().UseContainer()
+               new Builder().UseContainer()
                     .UseImage($"{REPOSITORY}/{image}")
                     .WithName(container_name)
                     .ExposePort(host_port,container_port)
                     .Build()
-                    .Start()) {
-
-                }
+                    .Start();
             } 
             catch (Exception e) 
             {
                 return e.Message;
             }
             return "";
+        }
+
+        public static async Task<Dictionary<string,string>> GetStatus(string userId)
+        {
+            var defs = UserManager.GetContainerDefinitions(userId).Result;
+            var ps = Ps();
+
+            Dictionary<string,string> response = new();
+            foreach (var def in defs) 
+            {
+                string state = "NotStarted";
+                foreach (var service in ps) 
+                {
+                    if (service.Name == def.prefix+"_"+userId) {
+                        state = service.State.ToString();
+                    }
+                }
+                response[def.prefix] = state;
+            }
+            return response;
+        }
+
+        public static IList<Ductus.FluentDocker.Services.IContainerService> Ps() 
+        {
+            var builder = new Builder();
+            try
+            {
+                var hosts = new Hosts().Discover();
+                var _docker = hosts.FirstOrDefault(x => x.IsNative) ?? hosts.FirstOrDefault(x => x.Name == "default");
+                return _docker.GetRunningContainers();
+
+            } 
+            catch (Exception e) 
+            {
+                return new List<Ductus.FluentDocker.Services.IContainerService>();
+            }
         }
 
         static bool getAvailablePortOS(out int port,int min, int max)
@@ -89,8 +133,6 @@ namespace Constellation_WebApi
                 .Replace("/","")
                 .Replace("..", "")
                 .Replace(@"\","");
-            
-
         }
 
         public static void Stop(string containerName)
