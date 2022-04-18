@@ -56,13 +56,15 @@ namespace Constellation_WebApi
 
         public static async Task<T> GetDoc<T>(string database, string id)
         {
-           
             try 
             {
                 string request = $"{host}{database}/{id}";
                 HttpResponseMessage response = await client.GetAsync(request);
                 string responseText = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<T>(responseText);
+                JsonSerializerOptions options = new JsonSerializerOptions();
+                options.MaxDepth = 16;
+
+                return JsonSerializer.Deserialize<T>(responseText, options);
             }
             catch(HttpRequestException e)
             {
@@ -167,11 +169,6 @@ namespace Constellation_WebApi
 
             return response.StatusCode == HttpStatusCode.Created;
         }
-
-        public static async void GetContainerDefinitions() 
-        {
-            
-        }
     }
     public class QueryResponse<T> {
         public List<T> docs {get;set;}
@@ -210,8 +207,7 @@ namespace Constellation_WebApi
         public string username {get;set;}
         public string password {get;set;}
         public string course {get;set;}
-        public List<ContainerDefinition> container_defititions {get;set;} = new List<ContainerDefinition>();
-
+        public List<ContainerDefinition> container_definitions {get;set;} = new List<ContainerDefinition>();
 
     }
     public class ContainerDefinition

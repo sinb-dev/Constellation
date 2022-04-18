@@ -70,5 +70,21 @@ namespace Constellation_WebApi.SessionHandling
             var hexString = BitConverter.ToString(ba);
             return hexString.Replace("-","");
         }
+
+        public static async Task<List<ContainerDefinition>> GetContainerDefinitions(string username, string course) 
+        {
+            return await GetContainerDefinitions(username+"_"+course);
+            
+        }
+        public static async Task<List<ContainerDefinition>> GetContainerDefinitions(string userid) 
+        {
+            string user_db = "userdb-" + Hex(userid);
+            user_db = user_db.ToLower();
+            ConfigurationDocument config = await Database.GetDoc<ConfigurationDocument>(user_db,"user");
+            if (config != null) {
+                return config.container_definitions;
+            }
+            return new List<ContainerDefinition>();
+        }
     }
 }
